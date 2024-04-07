@@ -1,0 +1,36 @@
+<html>
+<head>
+  <title>Online C Compiler</title>
+</head>
+<body>
+  <h1>Online C Compiler</h1>
+  <form id="compileForm">
+    <textarea id="code" name="code" rows="10" cols="50"></textarea>
+    <br>
+    <button>Submit</button>
+  </form>
+  <textarea name="output" id="output" cols="30" rows="10">
+  </textarea>
+  <div id="result"></div>
+</body>
+<script>
+  document.getElementById('compileForm').addEventListener('submit', function (event) {
+    event.preventDefault();
+    const code = document.getElementById('code').value;
+    fetch('/compile', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ code: code })
+    })
+    .then(response => response.text()) // Convert response to text
+    .then(data => {
+      document.getElementById('output').innerText = data; // Set response to output textarea
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+  });
+</script>
+</html>
