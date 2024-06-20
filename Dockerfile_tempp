@@ -1,0 +1,34 @@
+# Use the dind (Docker-in-Docker) base image
+FROM docker:stable-dind
+
+# Install Node.js and npm
+RUN apk add --no-cache nodejs npm
+
+# Verify installation
+RUN node -v
+RUN npm -v
+
+# Create a directory for the Node.js server code
+WORKDIR /app
+
+# Copy the Node.js server code into the container
+COPY . .
+
+# Install the dependencies
+RUN npm install
+
+# Pull necessary images
+# Mount the Docker socket from the host
+RUN docker run \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    ...
+
+RUN docker pull gcc:latest
+RUN docker pull python:3.10-slim
+RUN docker pull node:16.17.0-bullseye-slim
+RUN docker pull openjdk:20-slim
+
+# Expose the necessary ports
+EXPOSE 5000
+
+CMD node index.js

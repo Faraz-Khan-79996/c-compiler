@@ -1,7 +1,16 @@
 <html>
+
 <head>
   <title>Online C Compiler</title>
+
+  <style>
+    #output {
+      white-space: pre-wrap;
+    }
+  </style>
+
 </head>
+
 <body>
   <h1>Online C Compiler</h1>
   <form id="compileForm">
@@ -17,20 +26,42 @@
   document.getElementById('compileForm').addEventListener('submit', function (event) {
     event.preventDefault();
     const code = document.getElementById('code').value;
-    fetch('/compile', {
+    fetch('/run', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ code: code })
     })
-    .then(response => response.text()) // Convert response to text
-    .then(data => {
-      document.getElementById('output').innerText = data; // Set response to output textarea
-    })
-    .catch(error => {
-      console.error('Error:', error);
-    });
+      .then(response => response.json()) // Convert response to text
+      .then(data => {
+        document.getElementById('output').innerText = JSON.stringify(data); // Set response to output textarea
+
+        const poll = setInterval(() => {
+          fetch(`/status?id=${data._id}`)
+            .then(response => response.json())
+            .then(data => {
+              const status = data.status;
+              console.log(status);
+
+              if(status == "completed"){
+                clearInterval(poll)
+                if(data.error)
+                  document.getElementById('output').innerText = JSON.stringify(data.error)
+                else
+                document.getElementById('output').innerText = JSON.stringify(data.output)
+              }
+            })
+        } , 100)
+
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
   });
+
+
+
 </script>
+
 </html>
